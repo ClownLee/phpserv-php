@@ -1,5 +1,6 @@
 FROM php:7.4.7-fpm-alpine
 COPY exts /exts
+COPY init/composer.phar /usr/local/bin/composer
 RUN  sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
   && apk update \
   && apk add --update --no-cache build-base autoconf \
@@ -66,6 +67,8 @@ RUN  sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositorie
   && docker-php-ext-configure zip \
   && docker-php-ext-install -j$(nproc) zip \
   && cp -r /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
-  && sed -i 's/;date.timezone =/date.timezone=Asia\/Shanghai/g' /usr/local/etc/php/php.ini
+  && sed -i 's/;date.timezone =/date.timezone=Asia\/Shanghai/g' /usr/local/etc/php/php.ini \
+  && chmod -R 0777 /usr/local/bin/composer \
+  && php /usr/local/bin/composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 EXPOSE 9000
 CMD ["php-fpm"]
